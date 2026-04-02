@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>葫芦侠 - 让玩机更简单</title>
+    <style>
+        /* 1. 提取CSS变量，统一样式管理 */
+        :root {
+            --primary-color: #4caf50;
+            --secondary-color: #8bc34a;
+            --primary-gradient: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            --ios-gradient: linear-gradient(90deg, #0088ff, #00a3ff);
+            --bg-base: #F0F2F5;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --white: #FFFFFF;
+            --border-color: #E3E8ED;
+            --shadow-base: 0 8px 30px rgba(0, 0, 0, 0.1);
+            --shadow-primary: 0 8px 30px rgba(76, 175, 80, 0.2);
+        }
+
+        /* 移动端跳转按钮 - 完全匹配你的风格 */
+        .mobile-jump-btn {
+            padding: 8px 16px;
+            background: var(--primary-gradient);
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .mobile-jump-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        /* 手机端自动隐藏此按钮（合理） */
+        @media (max-width: 768px) {
+            .mobile-jump-btn {
+                display: none;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, 'Microsoft YaHei', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg-base);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        ul,
+        li {
+            list-style: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* 2. BEM命名规范 + 语义化 */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .title-logo {
+            width: 60px;
+            height: 60px;
+            vertical-align: middle;
+            margin-right: 16px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        .section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 80px 0;
+            position: relative;
+            padding-bottom: 120px;
+        }
+
+        .section--products {
+            padding-top: 60px;
+        }
+
+        .title {
+            font-size: 52px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -moz-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
+        }
+
+        .text {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            max-width: 700px;
+            line-height: 1.9;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 998;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .header--scrolled {
+            padding: 16px 40px;
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        /* 需求2修改：去掉logo边框，调整背景 */
+        .logo-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: none; /* 移除button默认边框 */
+            outline: none; /* 移除点击外边框 */
+            background: transparent; /* 移除button默认背景 */
+            cursor: pointer; /* 保持手型光标 */
+        }
+
+        .logo-img {
+            width: 50px;
+            height: auto;
+            border-radius: 12px; /* 保留圆角背景（可根据需求改为0实现方形） */
+            box-shadow: none; /* 移除阴影边框 */
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -moz-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 15px rgba(76, 175, 80, 0.3);
+            letter-spacing: 1px;
+        }
+
+        /* 需求1修改：删除右侧白色竖长椭圆背景，保留按钮布局 */
+        .sidebar-nav {
+            position: fixed;
+            top: 50%;
+            right: 40px;
+            transform: translateY(-50%);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            /* 核心：保留垂直分散居中布局 */
+            justify-content: space-around;
+            align-items: center;
+            gap: 0;
+            height: 60vh;
+            padding: 0 !important; /* 移除内边距，消除背景空间 */
+            margin: 0 !important;
+            /* 彻底移除白色椭圆背景相关样式 */
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .sidebar-nav__item {
+            position: relative;
+            cursor: pointer;
+            list-style: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .sidebar-nav__link {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            /* 核心：统一宽高 + 居中（完全保留原样式） */
+            width: 100px;
+            height: 44px;
+            line-height: 44px;
+            text-align: center;
+            display: block;
+            position: relative;
+            font-weight: 500;
+            border-radius: 22px;
+            padding: 0 !important;
+            margin: 0 !important;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-nav__link::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            transition: width 0.3s ease;
+        }
+
+        /* 统一hover/激活样式（完全保留原样式） */
+        .sidebar-nav__link:hover,
+        .sidebar-nav__link--active {
+            color: var(--primary-color);
+            background: rgba(76, 175, 80, 0.1);
+            transform: none;
+        }
+
+        .sidebar-nav__link:hover::after,
+        .sidebar-nav__link--active::after {
+            width: 60%;
+        }
+
+        .hero {
+            background: radial-gradient(circle at 20% 50%, rgba(76, 175, 80, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(139, 195, 74, 0.1) 0%, transparent 40%),
+                var(--bg-base);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(76, 175, 80, 0.1) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: float 6s ease-in-out infinite;
+            will-change: transform;
+            /* 性能优化 */
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+
+        .hero__content {
+            max-width: 900px;
+            padding: 48px;
+            background: var(--white);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero__title {
+            font-size: 72px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), #43a047);
+            -webkit-background-clip: text;
+            -moz-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 40px rgba(76, 175, 80, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .hero__subtitle {
+            font-size: 22px;
+            margin-bottom: 48px;
+            color: #555;
+            font-weight: 400;
+        }
+
+        /* 替换div为button，提升可访问性 */
+        /* 统一为和其他按钮完全一致的样式 */
+        .hero__cta {
+            display: inline-block;
+            width: 100%;
+            /* 移动端满宽，和下载按钮对齐 */
+            padding: 12px 32px;
+            background: var(--primary-gradient);
+            color: var(--white);
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+            border: none;
+            cursor: pointer;
+            text-align: center;
+            line-height: 1.5;
+            tabindex: 0;
+        }
+
+        .hero__cta:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .products {
+            background: var(--bg-base);
+            padding-top: 60px;
+            position: relative;
+            padding-bottom: 120px;
+        }
+
+        .products::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 0%, rgba(76, 175, 80, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .product-banner {
+            width: 100%;
+            height: 280px;
+            margin: 40px 0 60px;
+            background: var(--primary-gradient),
+                url('https://picsum.photos/id/1068/192/280') center/cover no-repeat;
+            background-blend-mode: overlay;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            box-shadow: 0 15px 50px rgba(76, 175, 80, 0.2);
+            position: relative;
+            overflow: hidden;
+            will-change: transform;
+        }
+
+        .product-banner::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 25, 0.1), transparent);
+            animation: shine 3s infinite;
+            will-change: transform;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        .product-banner__title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 2;
+            color: var(--white);
+        }
+
+        .product-banner__desc {
+            font-size: 18px;
+            opacity: 0.95;
+            font-weight: 400;
+            position: relative;
+            z-index: 2;
+            color: var(--white);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .product-card {
+            background: var(--white);
+            backdrop-filter: blur(15px);
+            padding: 48px 32px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.4s ease;
+            box-shadow: var(--shadow-base);
+            will-change: transform;
+        }
+
+        .product-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            border-color: rgba(76, 175, 80, 0.4);
+            box-shadow: 0 15px 50px rgba(76, 175, 80, 0.15);
+        }
+
+        .product-card__icon {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 28px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid rgba(76, 175, 80, 0.3);
+            padding: 4px;
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .product-card__name {
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 28px;
+            color: var(--text-primary);
+        }
+
+        .download-btn {
+            display: inline-block;
+            padding: 12px 32px;
+            background: var(--primary-gradient);
+            color: var(--white);
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            margin: 0 6px 12px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+            border: none;
+            cursor: pointer;
+            tabindex: 0;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        .download-btn--ios {
+            background: var(--ios-gradient);
+        }
+
+        .download-btn--ios:hover {
+            box-shadow: 0 6px 20px rgba(0, 136, 255, 0.4);
+        }
+
+        .about-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: var(--bg-base);
+            padding: 120px 0 80px;
+            z-index: 997;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            pointer-events: none;
+            box-sizing: border-box;
+            aria-hidden: true;
+            /* 可访问性 */
+        }
+
+        .about-section--active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+            aria-hidden: false;
+        }
+
+        .about-container {
+            display: flex;
+            gap: 60px;
+            align-items: flex-start;
+            padding-bottom: 20px;
+        }
+
+        .about-sidebar {
+            width: 200px;
+            flex-shrink: 0;
+        }
+
+        .about-sidebar__list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .about-sidebar__link {
+            font-size: 16px;
+            color: var(--text-secondary);
+            padding: 12px 0;
+            cursor: pointer;
+            position: relative;
+            display: block;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            tabindex: 0;
+        }
+
+        .about-sidebar__link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            transition: width 0.3s ease;
+        }
+
+        .about-sidebar__link:hover,
+        .about-sidebar__link--active {
+            color: var(--primary-color);
+            padding-left: 8px;
+            background: rgba(76, 175, 80, 0.05);
+        }
+
+        .about-sidebar__link:hover::after,
+        .about-sidebar__link--active::after {
+            width: 100%;
+        }
+
+        .about-divider {
+            width: 1px;
+            background: var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .about-content {
+            flex: 1;
+            padding: 10px 0;
+            display: none;
+        }
+
+        .about-content--active {
+            display: block;
+        }
+
+        .about-content__title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -moz-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .about-content__title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 4px;
+            height: 32px;
+            background: var(--primary-gradient);
+            border-radius: 2px;
+        }
+
+        .about-card-group,
+        .contact-group,
+        .disclaimer-group {
+            display: flex;
+            gap: 24px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            align-items: stretch;
+        }
+
+        .about-card,
+        .contact-item,
+        .disclaimer-item {
+            flex: 1;
+            min-width: 280px;
+            background: var(--white);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            will-change: transform;
+        }
+
+        .about-card:hover,
+        .contact-item:hover,
+        .disclaimer-item:hover {
+            transform: translateY(-5px);
+            border-color: rgba(76, 175, 80, 0.3);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.08);
+        }
+
+        .contact-item {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .disclaimer-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .about-card__title {
+            font-size: 20px;
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-item__title {
+            font-size: 20px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .about-card__desc,
+        .contact-item__desc,
+        .disclaimer-item__desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .contact-item__desc span {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        /* 提取公共footer样式，避免重复 */
+        .footer {
+            width: 100%;
+            padding: 30px 40px;
+            background: var(--white);
+            color: var(--text-secondary);
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        .footer--global {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        .footer--about {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            padding: 20px 40px;
+            z-index: 998;
+        }
+
+        .footer__text {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #888;
+        }
+
+        .footer__copyright {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* 响应式优化：媒体查询集中管理 */
+        @media (max-width: 768px) {
+            .sidebar-nav {
+                display: none;
+            }
+
+            .hero__title {
+                font-size: 42px;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .title-logo {
+                width: 50px;
+                height: 50px;
+            }
+
+            .title {
+                font-size: 36px;
+            }
+
+            .hero__content {
+                padding: 24px;
+            }
+
+            .product-banner {
+                height: 200px;
+            }
+
+            .about-container {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .about-sidebar {
+                width: 100%;
+            }
+
+            .about-divider {
+                width: 100%;
+                height: 1px;
+            }
+
+            .logo-text {
+                font-size: 20px;
+            }
+
+            .section--products {
+                padding-top: 40px;
+            }
+
+            .products {
+                padding-top: 40px;
+            }
+
+            .about-card-group,
+            .contact-group,
+            .disclaimer-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 语义化头部 -->
+    <header class="header" id="header">
+    <button class="logo-link" onclick="goToHome()" aria-label="返回首页">
+        <img src="https://www.huluxia.com/img/logo_xj.png" alt="葫芦侠官方logo-绿色卡通风格" class="logo-img">
+        <span class="logo-text">葫芦侠</span>
+    </button>
+
+    <!-- 移动端跳转按钮 -->
+    <button class="mobile-jump-btn" onclick="window.location.href='试错2.html'">
+        移动端体验
+    </button>
+
+</header>
+
+    <!-- 侧边导航 -->
+    <nav class="sidebar-nav" id="sidebarNav">
+        <li class="sidebar-nav__item">
+            <button class="sidebar-nav__link sidebar-nav__link--active" onclick="goToHome()"
+                aria-label="导航至首页">首页</button>
+        </li>
+        <li class="sidebar-nav__item">
+            <button class="sidebar-nav__link" onclick="goToProduct()" aria-label="导航至产品页">关于产品</button>
+        </li>
+        <li class="sidebar-nav__item">
+            <button class="sidebar-nav__link" onclick="showAbout('about', 2)" aria-label="导航至关于我们">关于我们</button>
+        </li>
+        <li class="sidebar-nav__item">
+            <button class="sidebar-nav__link" onclick="showAbout('contact', 3)" aria-label="导航至联系我们">联系我们</button>
+        </li>
+        <li class="sidebar-nav__item">
+            <button class="sidebar-nav__link" onclick="showAbout('disclaimer', 4)" aria-label="导航至免责声明">免责声明</button>
+        </li>
+    </nav>
+
+    <!-- 主内容区 -->
+    <main>
+        <section class="hero section" id="hero">
+            <div class="hero__content">
+                <h1 class="hero__title">
+                    让玩机更简单
+                    <img src="https://www.huluxia.com/img/logo_xj.png" alt="葫芦侠标题logo" class="title-logo">
+                </h1>
+                <p class="hero__subtitle">葫芦侠 - 一站式移动玩机社区，覆盖海量游戏、实用工具、趣味交流社区</p>
+                <button class="hero__cta" onclick="goToProduct()" aria-label="点击探索葫芦侠产品">探索产品</button>
+            </div>
+        </section>
+
+        <section class="products section section--products" id="products">
+            <div class="container">
+                <h2 class="title">我们的产品</h2>
+                <p class="text">专注移动玩机领域，打造简单、实用、有趣的产品矩阵，为亿万玩机用户提供一站式服务</p>
+                <div class="product-banner">
+                    <h3 class="product-banner__title">全场景玩机生态 · 千万用户信赖</h3>
+                    <p class="product-banner__desc">安全稳定 | 免费易用 | 持续更新 | 官方保障</p>
+                </div>
+                <div class="product-grid">
+                    <div class="product-card">
+                        <div class="product-card__icon">
+                            <img src="https://www.huluxia.com/img/logo_xj.png" alt="葫芦侠APP图标">
+                        </div>
+                        <h3 class="product-card__name">葫芦侠</h3>
+                        <a href="https://down.huluxia.net/hlx/huluxia.apk" class="download-btn" target="_blank"
+                            aria-label="下载葫芦侠安卓版">安卓版下载</a>
+                        <a href="https://apps.apple.com/cn/app/id1207701288" class="download-btn download-btn--ios"
+                            target="_blank" aria-label="下载葫芦侠苹果版">苹果版下载</a>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-card__icon">
+                            <img src="https://www.huluxia.com/img/logo_xj.png" alt="葫芦侠3楼APP图标">
+                        </div>
+                        <h3 class="product-card__name">葫芦侠3楼</h3>
+                        <a href="https://down.huluxia.net/hlx/f3.apk" class="download-btn" target="_blank"
+                            aria-label="下载葫芦侠3楼安卓版">安卓版下载</a>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-card__icon">
+                            <img src="https://www.huluxia.com/img/logo_xj.png" alt="葫芦侠虚拟机APP图标">
+                        </div>
+                        <h3 class="product-card__name">葫芦侠虚拟机</h3>
+                        <a href="https://down.vuluxia.net/virtual/apk/virtual.apk" class="download-btn" target="_blank"
+                            aria-label="下载葫芦侠虚拟机安卓版">安卓版下载</a>
+                    </div>
+                </div>
+            </div>
+            <!-- 公共footer组件 -->
+            <footer class="footer footer--global">
+                <div class="footer__text">葫芦侠 - 让玩机更简单</div>
+                <div class="footer__copyright">© 2026 广州侠聚网络科技有限公司版权所有 | 粤ICP备19142258号</div>
+            </footer>
+        </section>
+
+        <section class="about-section" id="about-section">
+            <div class="container about-container">
+                <div class="about-sidebar">
+                    <ul class="about-sidebar__list">
+                        <li>
+                            <button class="about-sidebar__link" onclick="switchAbout('about')"
+                                aria-label="切换至关于我们">关于我们</button>
+                        </li>
+                        <li>
+                            <button class="about-sidebar__link" onclick="switchAbout('contact')"
+                                aria-label="切换至联系我们">联系我们</button>
+                        </li>
+                        <li>
+                            <button class="about-sidebar__link" onclick="switchAbout('disclaimer')"
+                                aria-label="切换至免责声明">免责声明</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="about-divider"></div>
+                <div class="about-content-wrap">
+                    <div class="about-content about-content--active" id="about">
+                        <h3 class="about-content__title">关于葫芦侠</h3>
+                        <div class="about-card-group">
+                            <div class="about-card">
+                                <h4 class="about-card__title">🏢 企业简介</h4>
+                                <p class="about-card__desc">
+                                    广州侠聚网络科技有限公司成立于2017年，是专注移动互联网应用开发的创新科技企业，核心团队均来自国内一线互联网企业，拥有资深研发与运营经验。</p>
+                            </div>
+                            <div class="about-card">
+                                <h4 class="about-card__title">🚀 核心产品</h4>
+                                <p class="about-card__desc">
+                                    葫芦侠系列产品覆盖安卓全平台，累计下载量超数亿次，千万级月活用户，打造集游戏资源、玩机工具、社区交流于一体的一站式玩机生态。</p>
+                            </div>
+                            <div class="about-card">
+                                <h4 class="about-card__title">💡 企业理念</h4>
+                                <p class="about-card__desc">
+                                    秉持「用户第一、创新驱动、诚信正直、合作共赢」的核心价值观，持续迭代产品功能，用技术优化体验，满足亿万用户多元化玩机需求。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-content" id="contact">
+                        <h3 class="about-content__title">联系我们</h3>
+                        <div class="contact-group">
+                            <div class="contact-item">
+                                <h4 class="contact-item__title">🎧 客服支持</h4>
+                                <p class="contact-item__desc">客服QQ：<span>800183051</span></p>
+                                <p class="contact-item__desc">工作时间：<span>9:30-18:30（法定节假日除外）</span></p>
+                                <p class="contact-item__desc">官方邮箱：<span>tangkun@huluxia.com</span></p>
+                                <p class="contact-item__desc">投诉信息发送至邮箱：<span>service.mail@huluxia.com</span></p>
+                            </div>
+                            <div class="contact-item">
+                                <h4 class="contact-item__title">🤝 商务合作</h4>
+                                <p class="contact-item__desc">合作邮箱：<span>tangkun@huluxia.com</span></p>
+                                <p class="contact-item__desc">合作范围：广告投放、渠道推广、内容联名、产品合作</p>
+                            </div>
+                            <div class="contact-item">
+                                <h4 class="contact-item__title">📍 公司地址</h4>
+                                <p class="contact-item__desc">广州市天河区建中路64,66号佳都商务大厦西塔301房</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="about-content" id="disclaimer">
+                        <h3 class="about-content__title">免责声明</h3>
+                        <div class="disclaimer-group">
+                            <div class="disclaimer-item">
+                                <span class="disclaimer-tag">内容声明</span>
+                                <p class="disclaimer-item__desc">
+                                    本平台部分内容由用户自主发布，平台仅提供信息存储空间服务，无法逐一审核所有内容的真实性、合法性，用户发布内容仅代表个人观点，不代表平台立场。</p>
+                            </div>
+                            <div class="disclaimer-item">
+                                <span class="disclaimer-tag">使用风险</span>
+                                <p class="disclaimer-item__desc">
+                                    用户下载使用平台应用、工具需遵守相关法律法规，因用户违规操作、设备不兼容、网络异常等非平台原因造成的损失，本平台不承担任何法律责任。</p>
+                            </div>
+                            <div class="disclaimer-item">
+                                <span class="disclaimer-tag">第三方声明</span>
+                                <p class="disclaimer-item__desc">
+                                    平台内包含的第三方网站/服务链接，仅为用户便利提供，本平台不对第三方的内容、安全性、合法性负责，用户访问需自行承担风险。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 公共footer组件 -->
+            <footer class="footer footer--about">
+                <div class="footer__text">葫芦侠 - 让玩机更简单</div>
+                <div class="footer__copyright">© 2026 广州侠聚网络科技有限公司版权所有 | 粤ICP备19142258号</div>
+            </footer>
+        </section>
+    </main>
+
+    <script>
+        // 1. 封装为IIFE，避免全局污染
+        (() => {
+            // 2. 节流函数：优化scroll性能
+            const throttle = (fn, delay = 100) => {
+                let timer = null;
+                return (...args) => {
+                    if (!timer) {
+                        timer = setTimeout(() => {
+                            fn.apply(this, args);
+                            timer = null;
+                        }, delay);
+                    }
+                };
+            };
+
+            // 3. DOM元素获取
+            const heroSection = document.getElementById('hero');
+            const productSection = document.getElementById('products');
+            const aboutSection = document.getElementById('about-section');
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav__link');
+            const aboutSideLinks = document.querySelectorAll('.about-sidebar__link');
+            
+            // 核心：滚动监听自动激活导航
+            const handleScroll = throttle(() => {
+                // 头部样式
+                const header = document.getElementById('header');
+                if (header) header.classList.toggle('header--scrolled', window.scrollY > 50);
+
+                // 弹窗打开时不执行滚动逻辑
+                if (aboutSection.classList.contains('about-section--active')) return;
+
+                const scrollPos = window.scrollY;
+                const productOffset = productSection.offsetTop - 100;
+
+                // 滚动切换导航激活状态
+                if (scrollPos < productOffset) {
+                    setActiveNav(0); // 首页
+                } else {
+                    setActiveNav(1); // 产品页
+                }
+            });
+
+            // 滚动事件监听
+            window.addEventListener('scroll', handleScroll);
+
+            // 设置导航激活状态
+            const setActiveNav = (index) => {
+                sidebarLinks.forEach((link, idx) => {
+                    link.classList.toggle('sidebar-nav__link--active', idx === index);
+                });
+            };
+
+            const setSideActive = (id) => {
+                aboutSideLinks.forEach(link => {
+                    link.classList.toggle('about-sidebar__link--active', link.getAttribute('onclick').includes(id));
+                });
+            };
+
+            const setContentActive = (id) => {
+                document.querySelectorAll('.about-content').forEach(c => {
+                    c.classList.toggle('about-content--active', c.id === id);
+                });
+            };
+
+            // 页面跳转函数（平滑滚动）
+            window.goToHome = () => {
+                aboutSection.classList.remove('about-section--active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                setActiveNav(0);
+            };
+
+            window.goToProduct = () => {
+                aboutSection.classList.remove('about-section--active');
+                window.scrollTo({ top: productSection.offsetTop, behavior: 'smooth' });
+                setActiveNav(1);
+            };
+
+            window.showAbout = (target, index) => {
+                heroSection.classList.add('section--hidden');
+                productSection.classList.add('section--hidden');
+                aboutSection.classList.add('about-section--active');
+                setActiveNav(index);
+                setSideActive(target);
+                setContentActive(target);
+            };
+
+            window.switchAbout = (target) => {
+                setSideActive(target);
+                setContentActive(target);
+            };
+
+            // 初始化
+            handleScroll();
+        })();
+    </script>
+</body>
+
+</html>
